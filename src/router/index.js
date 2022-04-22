@@ -1,7 +1,6 @@
-import { format } from "prettier";
 import { createRouter, createWebHistory } from "vue-router";
-import Users from "../components/Users.vue";
-import UserDetail from "../components/UserDetail.vue";
+import Users from "../views/Users.vue";
+import UserDetail from "../views/UserDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

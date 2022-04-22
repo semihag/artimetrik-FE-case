@@ -4,12 +4,42 @@ import usersDetailData from "../data/users_detail.json";
 import coursesData from "../data/courses.json";
 
 export default createStore({
-  state: {},
-  getters: {
-      GET_USERS() {
-          return usersData;
-      }
+  state: {
+    users: usersData,
   },
-  mutations: {},
-  actions: {},
+  getters: {
+    ALL_USERS_COUNT() {
+      return usersData.length;
+    },
+    FILTERED_USERS_COUNT(state) {
+      return state.users.length;
+    },
+    USERS(state) {
+      return state.users;
+    },
+  },
+  mutations: {
+    UPDATE_USERS(state, users) {
+      state.users = users;
+    },
+  },
+  actions: {
+    FILTER_USERS(context, payLoad) {
+      debugger;
+      var filteredUsers = usersData;
+      if (payLoad.searchText != null) {
+        filteredUsers = filteredUsers.filter((user) =>
+          user.name.toUpperCase().includes(payLoad.searchText.toUpperCase())
+        );
+      }
+
+      if (payLoad.status != null) {
+        filteredUsers = filteredUsers.filter(
+          (user) => user.status == payLoad.status
+        );
+      }
+
+      context.commit("UPDATE_USERS", filteredUsers);
+    },
+  },
 });
