@@ -6,6 +6,8 @@ import coursesData from "../data/courses.json";
 export default createStore({
   state: {
     users: usersData,
+    userDetails : usersDetailData,
+    courses : coursesData
   },
   getters: {
     ALL_USERS_COUNT() {
@@ -16,6 +18,12 @@ export default createStore({
     },
     USERS(state) {
       return state.users;
+    },
+    USER_DETAILS(state) {
+      return state.userDetails;
+    },
+    COURSES(state) {
+      return state.courses;
     },
   },
   mutations: {

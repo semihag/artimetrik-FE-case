@@ -1,10 +1,17 @@
 <template>
   <div>
     <h1>users page</h1>
-
     <div class="row justify-content-center">
       <div class="col-8">
         <Filter />
+        <div
+          style="float: right;cursor:pointer;"
+          data-bs-toggle="modal"
+          data-bs-target="#new-user"
+        >
+          <img src="../images/add.svg" style="width: 48px" />
+        </div>
+
         <table class="table table-hover">
           <thead>
             <tr>
@@ -14,7 +21,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in this.usersOnPage" :key="user.id">
+            <tr
+              class="user-row"
+              v-for="user in this.usersOnPage"
+              :key="user.id"
+              @click="this.$router.push({ path: '/' + user.id })"
+            >
               <td>{{ user.id }}</td>
               <td>
                 {{ user.name }}
@@ -32,59 +44,49 @@
           </tbody>
         </table>
         <h6>Total Users : {{ ALL_USERS_COUNT }}</h6>
-        <nav aria-label="Page navigation">
-          <ul class="pagination justify-content-center">
-            <li v-if="currentPageNumber > 1" class="page-item">
-              <a
-                @click="GetUsers(currentPageNumber - 1)"
-                class="page-link"
-                href="#"
-                >Previous</a
-              >
-            </li>
-            <li
-              class="page-item"
-              :class="{ active: currentPageNumber == pn }"
-              v-for="pn in pageCount"
-              :key="pn.id"
-            >
-              <a @click="GetUsers(pn)" href="#" class="page-link"> {{ pn }}</a>
-            </li>
-            <li v-if="currentPageNumber < pageCount" class="page-item">
-              <a
-                @click="GetUsers(currentPageNumber + 1)"
-                class="page-link"
-                href="#"
-                >Next</a
-              >
-            </li>
-          </ul>
-        </nav>
+        <Pagination
+          style="float: right"
+          @GetUsers="GetUsers"
+          :currentPageNumber="currentPageNumber"
+          :pageCount="pageCount"
+        />
       </div>
     </div>
+    <Modal :modalId="'new-user'" :title="'New User'" :buttonText="'Save'">
+      <template v-slot:content>
+        <!-- add form  -->
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 import Filter from "../components/Filter.vue";
+import Pagination from "../components/Pagination.vue";
+import Add from "../components/Add.vue";
+import Modal from "../components/Modal.vue";
 export default {
   components: {
     Filter,
+    Pagination,
+    Add,
+    Modal,
   },
   data() {
     return {
       usersOnPage: [],
       currentPageNumber: 1,
       perPage: 5,
+      openModal: false,
     };
   },
-watch : {
-USERS() {
-  this.currentPageNumber = 1;
-  this.GetUsers(this.currentPageNumber);
-}
-},
+  watch: {
+    USERS() {
+      this.currentPageNumber = 1;
+      this.GetUsers(this.currentPageNumber);
+    },
+  },
   computed: {
     ...mapGetters(["ALL_USERS_COUNT", "FILTERED_USERS_COUNT", "USERS"]),
     pageCount() {
@@ -98,7 +100,7 @@ USERS() {
         (pageNumber - 1) * this.perPage,
         this.perPage * pageNumber
       );
-    },
+    }
   },
   created() {
     this.GetUsers(this.currentPageNumber);
@@ -109,5 +111,8 @@ USERS() {
 <style scoped>
 h1 {
   text-align: center;
+}
+.user-row {
+  cursor: pointer;
 }
 </style>
