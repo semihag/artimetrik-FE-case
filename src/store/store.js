@@ -6,8 +6,8 @@ import coursesData from "../data/courses.json";
 export default createStore({
   state: {
     users: usersData,
-    userDetails : usersDetailData,
-    courses : coursesData
+    userDetails: usersDetailData,
+    courses: coursesData,
   },
   getters: {
     ALL_USERS_COUNT() {
@@ -33,7 +33,6 @@ export default createStore({
   },
   actions: {
     FILTER_USERS(context, payLoad) {
-      debugger;
       var filteredUsers = usersData;
       if (payLoad.searchText != null) {
         filteredUsers = filteredUsers.filter((user) =>

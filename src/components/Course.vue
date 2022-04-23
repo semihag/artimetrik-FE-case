@@ -2,7 +2,7 @@
   <div id="course" class="card">
     <div class="card-body">
       <h5 class="card-title">Name : {{ courseName }}</h5>
-      <div><label>Measured At :</label> {{ measuredAtText }}</div>
+      <div><label>Measured At :</label> {{ MeasuredAt() }}</div>
       <div><label>Completed At :</label> {{ completedAt }}</div>
     </div>
   </div>
@@ -10,8 +10,8 @@
 <script>
 export default {
   props: ["courseName", "measuredAt", "completedAt"],
-  computed: {
-    measuredAtText() {
+  methods: {
+    MeasuredAt() {
       var seconds = Math.floor((this.measuredAt / 1000) % 60),
         minutes = Math.floor((this.measuredAt / (1000 * 60)) % 60),
         hours = Math.floor((this.measuredAt / (1000 * 60 * 60)) % 24);
@@ -22,6 +22,9 @@ export default {
 
       return hours + ":" + minutes + ":" + seconds;
     },
+  },
+  created() {
+    this.MeasuredAt();
   },
 };
 </script>
