@@ -1,9 +1,11 @@
 <template>
   <div>
-    <h1>users page</h1>
+    <h1>Users Page</h1>
     <div class="row justify-content-center">
       <div class="col-8">
+        <!-- serch and status filter -->
         <Filter />
+        <!-- excel and modal -->
         <div style="float: right; display: flex">
           <div>
             <img
@@ -12,11 +14,22 @@
               style="width: 48px; cursor: pointer"
             />
           </div>
-          <div data-bs-toggle="modal" data-bs-target="#new-user">
-            <img src="../images/add.svg" style="width: 48px; cursor: pointer" />
+          <div>
+            <img
+              @click="this.$store.commit('SET_NEW_USER_FORM_OPEN', true)"
+              src="../images/add.svg"
+              style="width: 48px; cursor: pointer"
+            />
           </div>
         </div>
+       
+        <Modal v-if="this.$store.getters.IS_NEW_USER_FORM_OPEN">
+          <template v-slot:content>
+            <UserForm />
+          </template>
+        </Modal>
 
+        <!-- users table -->
         <table class="table table-hover">
           <thead>
             <tr>
@@ -48,7 +61,9 @@
             </tr>
           </tbody>
         </table>
-        <h6>Total Users : {{ ALL_USERS_COUNT }}</h6>
+        <!-- total users count -->
+        <h6>Total Users : {{ TOTAL_USERS_COUNT() }}</h6>
+        <!-- pagination -->
         <Pagination
           style="float: right"
           @GetUsers="GetUsers"
@@ -57,11 +72,6 @@
         />
       </div>
     </div>
-    <Modal :modalId="'new-user'" :title="'New User'" :buttonText="'Save'">
-      <template v-slot:content>
-        <!-- add form  -->
-      </template>
-    </Modal>
   </div>
 </template>
 
@@ -69,43 +79,49 @@
 import { mapGetters } from "vuex";
 import Filter from "../components/Filter.vue";
 import Pagination from "../components/Pagination.vue";
-import Add from "../components/Add.vue";
 import Modal from "../components/Modal.vue";
+import UserForm from "../forms/UserForm.vue";
+
 export default {
   components: {
     Filter,
     Pagination,
-    Add,
     Modal,
+    UserForm,
   },
   data() {
     return {
       usersOnPage: [],
       currentPageNumber: 1,
       perPage: 5,
-      openModal: false,
       excelDataList: [],
+      showModal: false,
     };
   },
   watch: {
-    USERS() {
-      this.currentPageNumber = 1;
-      this.GetUsers(this.currentPageNumber);
+    USERS: {
+      handler() {
+        this.currentPageNumber = 1;
+        this.GetUsers(this.currentPageNumber);
+      },
+      deep: true,
     },
   },
   computed: {
     ...mapGetters([
-      "ALL_USERS_COUNT",
       "FILTERED_USERS_COUNT",
       "USERS",
       "USER_DETAILS",
       "COURSES",
     ]),
     pageCount() {
-      return Math.floor(this.FILTERED_USERS_COUNT / this.perPage) + 1;
+      return Math.ceil(this.FILTERED_USERS_COUNT / this.perPage);
     },
   },
   methods: {
+    TOTAL_USERS_COUNT() {
+      return this.$store.getters.ALL_USERS_COUNT;
+    },
     GetUsers(pageNumber) {
       this.currentPageNumber = pageNumber;
       this.usersOnPage = this.USERS.slice(
@@ -121,18 +137,19 @@ export default {
         let userDetailData = this.USER_DETAILS.find(
           (ud) => ud.user_id == user.id
         );
-
-        courseData.courses.forEach((c) => {
-          let excelData = {};
-          excelData.COURSE_NAME = c.course_name;
-          excelData.USER_NAME = user.name;
-          excelData.USER_STATUS = user.status;
-          excelData.AGE = userDetailData.age;
-          excelData.JOB = userDetailData.job;
-          excelData.MEASURED_AT = this.MeasuredAt(c.measured_at);
-          excelData.COMPLETED_AT = c.completed_at;
-          this.excelDataList.push(excelData);
-        });
+        if (courseData != null) {
+          courseData.courses.forEach((c) => {
+            let excelData = {};
+            excelData.COURSE_NAME = c.course_name;
+            excelData.USER_NAME = user.name;
+            excelData.USER_STATUS = user.status;
+            excelData.AGE = userDetailData.age;
+            excelData.JOB = userDetailData.job;
+            excelData.MEASURED_AT = this.MeasuredAt(c.measured_at);
+            excelData.COMPLETED_AT = c.completed_at;
+            this.excelDataList.push(excelData);
+          });
+        }
       }
       this.Download();
     },
@@ -143,17 +160,6 @@ export default {
       XLSX.utils.book_append_sheet(wb, ws, "Courses");
       XLSX.writeFile(wb, filename);
     },
-    MeasuredAt(measuredAt) {
-      var seconds = Math.floor((measuredAt / 1000) % 60),
-        minutes = Math.floor((measuredAt / (1000 * 60)) % 60),
-        hours = Math.floor((measuredAt / (1000 * 60 * 60)) % 24);
-
-      hours = hours < 10 ? "0" + hours : hours;
-      minutes = minutes < 10 ? "0" + minutes : minutes;
-      seconds = seconds < 10 ? "0" + seconds : seconds;
-
-      return hours + ":" + minutes + ":" + seconds;
-    }
   },
   created() {
     this.GetUsers(this.currentPageNumber);
@@ -164,6 +170,7 @@ export default {
 <style scoped>
 h1 {
   text-align: center;
+  margin-top: 50px;
 }
 .user-row {
   cursor: pointer;

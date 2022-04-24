@@ -1,23 +1,29 @@
 <template>
-<div class="modal fade" :id="modalId" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{title}}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-       <slot name="content"></slot>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">{{buttonText}}</button>
-      </div>
+  <Teleport to="body">
+    <div v-if="this.$store.getters.IS_MODAL_OPEN" class="custom-modal">
+       <img style="position:absolute;top:10px;right:10px;width: 24px; cursor: pointer" 
+              @click="this.$store.commit('SET_MODAL_OPEN', false)"
+              src="../images/close.svg"
+            />
+      <slot name="content"></slot>
     </div>
-  </div>
-</div>
+  </Teleport>
 </template>
-<script>
-export default {
-    props : ["title","buttonText","modalId"]
+
+<style>
+.custom-modal {
+  background: white;
+  position: fixed;
+  z-index: 999;
+  top: 20%;
+  left: 50%;
+  min-width: 350px;
+  margin-left: -150px;
+  padding: 30px;
+  border: 1px solid gray;
+   transition: all .3s ease;
 }
-</script>
+h5 {
+  text-align: center;
+}
+</style>

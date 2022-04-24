@@ -44,7 +44,6 @@ export default {
       });
     },
     status(val) {
-        debugger;
       this.$store.dispatch("FILTER_USERS", {
         searchText: this.searchText,
         status: val,
