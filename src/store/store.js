@@ -1,10 +1,13 @@
 import { createStore } from "vuex";
+import usersJson from "../data/users.json";
+import usersDetailJson from "../data/users_detail.json";
+import coursesJson from "../data/courses.json";
 
 export default createStore({
   state: {
-    users: JSON.parse(localStorage.getItem("usersData")),
-    userDetails: JSON.parse(localStorage.getItem("userDetailsData")),
-    courses: JSON.parse(localStorage.getItem("coursesData")),
+    users: JSON.parse(localStorage.getItem("usersData")) ?? usersJson,
+    userDetails: JSON.parse(localStorage.getItem("userDetailsData")) ?? usersDetailJson,
+    courses: JSON.parse(localStorage.getItem("coursesData")) ?? coursesJson,
     isModalOpen: false,
     isNewUserFormOpen: false,
     isEditUserFormOpen: false,
